@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Générateur de CV Complet</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<h1 style="text-align:center;">Générateur de CV Complet</h1>
+<div class="container">
+    <div class="form-container">
+        <h2>Informations personnelles</h2>
+        <input type="file" id="photo" accept="image/*" style="display:none;" onchange="afficherPhoto(event)"/>
+        <label for="photo" style="display:block; text-align:center; cursor:pointer;">
+            <div class="photo-upload" id="photo-preview"><i class="fas fa-camera" style="font-size:2em; color:#7f8c8d;"></i></div>
+            <p>Cliquez pour ajouter une photo</p>
+        </label>
+        <input type="text" id="nom" placeholder="Nom et prénom" oninput="mettreAJourCV()"/>
+        <input type="text" id="metier" placeholder="Métier" oninput="mettreAJourCV()"/>
+        <input type="text" id="adresse" placeholder="Adresse" oninput="mettreAJourCV()"/>
+        <input type="text" id="email" placeholder="Email" oninput="mettreAJourCV()"/>
+        <input type="text" id="telephone" placeholder="Téléphone" oninput="mettreAJourCV()"/>
+        <input type="text" id="naissance" placeholder="Date de naissance" oninput="mettreAJourCV()"/>
+        <div class="inline-checkbox">
+            <input type="checkbox" id="permis" onchange="mettreAJourCV()"/>
+            <label for="permis">Permis de conduire</label>
+        </div>
+
+        <div class="accroche-container">
+            <h2>Phrase d'accroche</h2>
+            <textarea id="accroche" placeholder="Votre phrase d'accroche ou motivation" oninput="mettreAJourCV()"></textarea>
+        </div>
+
+        <h2>Thème de couleurs</h2>
+        <div class="color-palette">
+            <div class="color-option selected" style="background:#2c3e50;" data-primary="#2c3e50" data-secondary="#3498db" onclick="changerCouleur(this)"></div>
+            <div class="color-option" style="background:#a21f51;" data-primary="#a21f51" data-secondary="#e91e63" onclick="changerCouleur(this)"></div>
+            <div class="color-option" style="background:#2e7d32;" data-primary="#2e7d32" data-secondary="#4caf50" onclick="changerCouleur(this)"></div>
+        </div>
+
+        <h2>Expérience</h2>
+        <div id="experiences">
+            <div class="experience">
+                <input type="text" class="poste" placeholder="Poste" oninput="mettreAJourCV()"/>
+                <input type="text" class="entreprise" placeholder="Entreprise" oninput="mettreAJourCV()"/>
+                <input type="text" class="periode" placeholder="Période" oninput="mettreAJourCV()"/>
+                <textarea class="description" placeholder="Description" rows="3" oninput="mettreAJourCV()"></textarea>
+            </div>
+        </div>
+        <button onclick="ajouterExperience()"><i class="fas fa-plus"></i> Ajouter une expérience</button>
+
+        <h2>Formations</h2>
+        <div id="formations">
+            <div class="formation">
+                <input type="text" class="diplome" placeholder="Diplôme" oninput="mettreAJourCV()"/>
+                <input type="text" class="etablissement" placeholder="Établissement" oninput="mettreAJourCV()"/>
+                <input type="text" class="annee" placeholder="Année" oninput="mettreAJourCV()"/>
+            </div>
+        </div>
+        <button onclick="ajouterFormation()"><i class="fas fa-plus"></i> Ajouter une formation</button>
+
+        <h2>Compétences et qualités</h2>
+        <textarea id="skills" placeholder="Séparez les compétences par des virgules" oninput="mettreAJourCV()"></textarea>
+
+        <button onclick="interchangerFormationsExperiences()">Interchanger Formations / Expériences</button>
+        <button onclick="genererPDF()"><i class="fas fa-file-pdf"></i> Télécharger le CV en PDF</button>
+    </div>
+
+    <div class="cv-preview" id="cv-preview-container">
+        <!-- Pages générées dynamiquement -->
+    </div>
+</div>
+
+<script src="js/script.js"></script>
+</body>
+</html>
