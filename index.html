@@ -9,6 +9,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+/* ═══════════════════════════════════════════════════════════
+   VARIABLES GLOBALES — couleurs, espacements, ombres
+   Ces variables sont réutilisées partout dans le CSS.
+   Modifier ici suffit à changer tout le thème de l'interface.
+═══════════════════════════════════════════════════════════ */
 :root {
     --primary: #1a1a2e;
     --accent: #e94560;
@@ -26,8 +31,11 @@
     --shadow: 0 4px 24px rgba(26,26,46,0.10);
 }
 
+/* Réinitialisation universelle : toutes les boîtes incluent
+   le padding dans leur largeur, et les marges par défaut sont supprimées */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Corps de page : fonte principale, fond gris clair, hauteur minimale plein écran */
 body {
     font-family: 'DM Sans', sans-serif;
     background: #f0f0f5;
@@ -36,7 +44,10 @@ body {
     padding: 0;
 }
 
-/* Header */
+/* ── En-tête fixe de l'application ─────────────────────────
+   Reste collé en haut de page (sticky) même lors du défilement.
+   Contient le logo, le titre et la tagline.
+──────────────────────────────────────────────────────────── */
 .app-header {
     background: var(--primary);
     padding: 18px 40px;
@@ -69,7 +80,10 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Layout */
+/* ── Mise en page principale ────────────────────────────────
+   Grille 2 colonnes : 420px pour le formulaire, le reste pour la prévisualisation.
+   La hauteur minimale occupe tout l'écran sous le header.
+──────────────────────────────────────────────────────────── */
 .workspace {
     display: grid;
     grid-template-columns: 420px 1fr;
@@ -77,7 +91,10 @@ body {
     min-height: calc(100vh - 72px);
 }
 
-/* Sidebar Form */
+/* ── Panneau formulaire (colonne gauche) ────────────────────
+   Scrollable indépendamment de la prévisualisation.
+   Position sticky pour rester visible lors du scroll de la page.
+──────────────────────────────────────────────────────────── */
 .form-panel {
     background: var(--surface);
     overflow-y: auto;
@@ -91,7 +108,10 @@ body {
     padding: 28px 24px 60px;
 }
 
-/* Section headings */
+/* ── Titres de section dans le formulaire ───────────────────
+   Police serif pour l'élégance, séparateur bas de page.
+   L'icône FontAwesome est colorée avec l'accent principal.
+──────────────────────────────────────────────────────────── */
 .section-title {
     font-family: 'Playfair Display', serif;
     font-size: 1.05rem;
@@ -109,7 +129,10 @@ body {
 }
 .section-title:first-child { margin-top: 0; }
 
-/* Photo upload */
+/* ── Zone de téléchargement de photo ────────────────────────
+   Zone cliquable avec bordure pointillée. Au survol, la bordure
+   et le fond changent pour indiquer l'interactivité.
+──────────────────────────────────────────────────────────── */
 .photo-zone {
     display: flex;
     align-items: center;
@@ -142,7 +165,11 @@ body {
 .photo-label span { font-size: 0.78rem; color: var(--text-muted); }
 input[type="file"] { display: none; }
 
-/* Form fields */
+/* ── Champs de formulaire ────────────────────────────────────
+   .field-group : grille 2 colonnes pour les champs côte à côte.
+   .field : empile le label au-dessus de l'input.
+   Au focus, la bordure et un halo coloré indiquent l'état actif.
+──────────────────────────────────────────────────────────── */
 .field-group {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -181,7 +208,10 @@ input[type="file"] { display: none; }
 }
 .field textarea { resize: vertical; min-height: 72px; }
 
-/* Checkbox */
+/* ── Case à cocher (permis de conduire) ─────────────────────
+   Alignement horizontal label + case. La couleur de la case
+   suit la variable d'accent.
+──────────────────────────────────────────────────────────── */
 .checkbox-row {
     display: flex;
     align-items: center;
@@ -196,7 +226,11 @@ input[type="file"] { display: none; }
     cursor: pointer;
 }
 
-/* Color palette */
+/* ── Palette de thèmes de couleur ───────────────────────────
+   Ronds cliquables affichant la couleur principale du thème.
+   L'état .selected est mis en évidence par un double halo.
+   Le label flottant en dessous est masqué par pointer-events:none.
+──────────────────────────────────────────────────────────── */
 .palette {
     display: flex;
     gap: 10px;
@@ -227,7 +261,10 @@ input[type="file"] { display: none; }
     pointer-events: none;
 }
 
-/* Dynamic entries */
+/* ── Cartes dynamiques (expériences, formations, langues) ───
+   Fond légèrement gris, animation d'apparition slideIn.
+   Le bouton de suppression (×) s'affiche en absolu en haut à droite.
+──────────────────────────────────────────────────────────── */
 .entry-card {
     background: var(--surface2);
     border-radius: var(--radius);
@@ -252,7 +289,13 @@ input[type="file"] { display: none; }
 }
 .entry-card .remove-btn:hover { color: var(--accent); background: rgba(233,69,96,0.08); }
 
-/* Buttons */
+/* ── Boutons ─────────────────────────────────────────────────
+   .btn          : base commune (flex, fonte, transition)
+   .btn-ghost     : discret, fond gris, bordure fine
+   .btn-primary   : fond accent rouge, effet de survol animé
+   .btn-secondary : fond sombre (couleur primaire)
+   .btn-outline   : transparent avec bordure pointillée, pleine largeur
+──────────────────────────────────────────────────────────── */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -292,6 +335,10 @@ input[type="file"] { display: none; }
 }
 .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(233,69,96,0.04); }
 
+/* ── Bouton "Interchanger" mis en évidence ───────────────────
+   S'active quand formations > expériences.
+   Animation pulsante orange pour attirer l'attention.
+──────────────────────────────────────────────────────────── */
 .btn-interchange-highlight {
     background: linear-gradient(135deg, #f0a500, #e07b00) !important;
     color: white !important;
@@ -307,6 +354,9 @@ input[type="file"] { display: none; }
     50%       { box-shadow: 0 0 0 6px rgba(240,165,0,0.15), 0 6px 20px rgba(240,165,0,0.45); }
 }
 
+/* ── Rangée d'actions en bas du formulaire ──────────────────
+   Séparée du contenu par une bordure haute, flex avec retour à la ligne.
+──────────────────────────────────────────────────────────── */
 .actions-row {
     display: flex;
     gap: 10px;
@@ -316,7 +366,10 @@ input[type="file"] { display: none; }
     flex-wrap: wrap;
 }
 
-/* Preview */
+/* ── Panneau de prévisualisation (colonne droite) ───────────
+   Fond gris anthracite pour faire ressortir le CV blanc.
+   Scrollable indépendamment du formulaire.
+──────────────────────────────────────────────────────────── */
 .preview-panel {
     padding: 40px;
     overflow-y: auto;
@@ -346,7 +399,11 @@ input[type="file"] { display: none; }
     font-size: 0.75rem;
 }
 
-/* CV Page */
+/* ── Page CV (format A4) ─────────────────────────────────────
+   Dimensions fixes 210mm × 297mm pour correspondre au format A4.
+   Affichée avec une ombre portée pour l'effet "feuille de papier".
+   overflow:hidden pour que le contenu ne déborde pas.
+──────────────────────────────────────────────────────────── */
 .cv-page {
     width: 210mm;
     min-height: 297mm;
@@ -443,7 +500,9 @@ input[type="file"] { display: none; }
     border-radius: 30px;
 }
 
-/* CV Main */
+/* ── Zone principale du CV (partie droite) ──────────────────
+   Occupe l'espace restant après la sidebar. Fond blanc.
+──────────────────────────────────────────────────────────── */
 .cv-main {
     flex: 1;
     padding: 32px 28px;
@@ -527,26 +586,38 @@ input[type="file"] { display: none; }
     border-left: 3px solid #ffc107;
 }
 
-/* Scrollbar */
+/* ── Scrollbar personnalisée (WebKit) ───────────────────────
+   Fine barre de défilement (4px) dans le panneau formulaire.
+──────────────────────────────────────────────────────────── */
 .form-panel::-webkit-scrollbar { width: 4px; }
 .form-panel::-webkit-scrollbar-track { background: transparent; }
 .form-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-/* Animations */
+/* ── Animations ──────────────────────────────────────────────
+   slideIn : apparition douce des cartes dynamiques (opacité + translation).
+──────────────────────────────────────────────────────────── */
 .entry-card { animation: slideIn 0.2s ease; }
 @keyframes slideIn {
     from { opacity: 0; transform: translateY(-8px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive scale for preview */
+/* ── Responsive (petits écrans < 1100px) ────────────────────
+   En dessous de 1100px, la grille passe en colonne unique.
+   Le formulaire n'est plus sticky et le CV est réduit à 65%.
+──────────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .workspace { grid-template-columns: 1fr; }
     .form-panel { height: auto; position: static; }
     .cv-page { transform: scale(0.65); transform-origin: top center; }
 }
 
-/* ── Suggestions modal ─────────────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   MODAL SUGGESTIONS DE PHRASES D'ACCROCHE
+   Superposée à toute la page (position:fixed, z-index:1000).
+   Placée directement dans <body> pour éviter les problèmes
+   de stacking context causés par overflow:auto sur les parents.
+═══════════════════════════════════════════════════════════ */
 .suggestions-overlay {
     position: fixed; inset: 0;
     background: rgba(10,10,30,0.55);
@@ -660,7 +731,10 @@ input[type="file"] { display: none; }
 }
 .modal-empty i { font-size: 2rem; display: block; margin-bottom: 8px; opacity: 0.3; }
 
-/* Badge auto-detect under métier field */
+/* ── Lien de suggestion sous le champ Métier ────────────────
+   Apparaît dynamiquement quand un métier connu est détecté.
+   Cliquable pour ouvrir directement la modal filtrée.
+──────────────────────────────────────────────────────────── */
 .metier-suggestion-hint {
     font-size: 0.75rem; color: var(--accent);
     display: flex; align-items: center; gap: 5px;
@@ -681,11 +755,15 @@ input[type="file"] { display: none; }
 </header>
 
 <div class="workspace">
-    <!-- FORM PANEL -->
+    <!-- ═══════════════════════════════════════════════════════
+     PANNEAU FORMULAIRE (colonne gauche)
+     Contient tous les champs de saisie du CV.
+     Reste fixe pendant le défilement (sticky).
+══════════════════════════════════════════════════════════ -->
     <aside class="form-panel">
         <div class="form-inner">
 
-            <!-- Photo -->
+            <!-- ── Section : Informations personnelles ──────────────── -->
             <div class="section-title"><i class="fas fa-user"></i> Informations personnelles</div>
 
             <input type="file" id="photo" accept="image/*" onchange="afficherPhoto(event)"/>
@@ -745,7 +823,7 @@ input[type="file"] { display: none; }
                 <span>Permis de conduire</span>
             </label>
 
-            <!-- Phrase d'accroche -->
+            <!-- ── Section : Phrase d'accroche ──────────────────────── -->
             <div class="section-title"><i class="fas fa-quote-left"></i> Phrase d'accroche</div>
             <div class="field single">
                 <label>Résumé / motivation</label>
@@ -759,7 +837,10 @@ input[type="file"] { display: none; }
             </button>
 
 
-            <!-- Thème -->
+            <!-- ── Section : Thème de couleurs ─────────────────────────
+         Chaque swatch stocke primary, secondary et accent2
+         en data-attributes. changerCouleur() les lit au clic.
+    ──────────────────────────────────────────────────────── -->
             <div class="section-title"><i class="fas fa-palette"></i> Thème de couleurs</div>
             <div class="palette">
                 <div class="palette-swatch selected" style="background:#1a1a2e;" data-primary="#1a1a2e" data-secondary="#e94560" data-accent2="#0f3460" onclick="changerCouleur(this)" title="Nuit de Paris">
@@ -797,35 +878,38 @@ input[type="file"] { display: none; }
                 </div>
             </div>
 
-            <!-- Expériences -->
+            <!-- ── Section : Expériences professionnelles ───────────── -->
             <div class="section-title"><i class="fas fa-briefcase"></i> Expériences professionnelles</div>
             <div id="experiences"></div>
             <button class="btn btn-outline" onclick="ajouterExperience()">
                 <i class="fas fa-plus"></i> Ajouter une expérience
             </button>
 
-            <!-- Formations -->
+            <!-- ── Section : Formations ─────────────────────────────── -->
             <div class="section-title"><i class="fas fa-graduation-cap"></i> Formations</div>
             <div id="formations"></div>
             <button class="btn btn-outline" onclick="ajouterFormation()">
                 <i class="fas fa-plus"></i> Ajouter une formation
             </button>
 
-            <!-- Langues -->
+            <!-- ── Section : Langues ────────────────────────────────── -->
             <div class="section-title"><i class="fas fa-language"></i> Langues</div>
             <div id="langues"></div>
             <button class="btn btn-outline" onclick="ajouterLangue()">
                 <i class="fas fa-plus"></i> Ajouter une langue
             </button>
 
-            <!-- Compétences -->
+            <!-- ── Section : Compétences & Qualités ─────────────────── -->
             <div class="section-title"><i class="fas fa-tools"></i> Compétences & Qualités</div>
             <div class="field single">
                 <label>Séparées par des virgules</label>
                 <textarea id="skills" placeholder="Ex : Travail en équipe, Rigueur, Gestion de projet, Bureautique..." oninput="mettreAJourCV()"></textarea>
             </div>
 
-            <!-- Conseil interchanger -->
+            <!-- ── Bandeau conseil "Interchanger" ───────────────────────
+         Visible uniquement si formations > expériences.
+         N'apparaît PAS dans le PDF (hors de .cv-page).
+    ──────────────────────────────────────────────────────── -->
             <div id="conseil-interchange" style="display:none; background:#fffbe6; border:1.5px solid #f0c040; border-radius:10px; padding:12px 14px; margin-top:20px; font-size:0.82rem; color:#7a5c00; line-height:1.5; animation: slideIn 0.3s ease;">
                 <div style="display:flex; align-items:flex-start; gap:10px;">
                     <i class="fas fa-lightbulb" style="color:#f0a500; margin-top:2px; flex-shrink:0;"></i>
@@ -836,7 +920,7 @@ input[type="file"] { display: none; }
                 </div>
             </div>
 
-            <!-- Actions -->
+            <!-- ── Boutons d'action ──────────────────────────────────── -->
             <div class="actions-row">
                 <button id="btn-interchange" class="btn btn-secondary" onclick="interchangerFormationsExperiences()">
                     <i class="fas fa-exchange-alt"></i> Interchanger Formations/Expériences
@@ -849,7 +933,11 @@ input[type="file"] { display: none; }
         </div>
     </aside>
 
-    <!-- PREVIEW PANEL -->
+    <!-- ═══════════════════════════════════════════════════════
+     PANNEAU PRÉVISUALISATION (colonne droite)
+     Le CV est reconstruit en HTML à chaque frappe.
+     Seul #cv-preview-container est mis à jour dynamiquement.
+══════════════════════════════════════════════════════════ -->
     <main class="preview-panel">
         <div class="preview-toolbar">
             <i class="fas fa-eye" style="color:var(--accent);"></i>
@@ -861,14 +949,21 @@ input[type="file"] { display: none; }
 </div>
 
 <script>
-// ─── State ───────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// ÉTAT GLOBAL
+// Stocke le thème actif (couleurs primaire, secondaire, accent).
+// Mis à jour à chaque changement de palette.
+// ═══════════════════════════════════════════════════════════
 let currentTheme = {
     primary: '#1a1a2e',
     secondary: '#e94560',
     accent2: '#0f3460'
 };
 
-// ─── Photo ───────────────────────────────────────────────────────────────────
+// ── Chargement de la photo de profil ────────────────────────
+// Lit le fichier image sélectionné via FileReader,
+// l'encode en base64 et l'injecte dans la prévisualisation.
+// ─────────────────────────────────────────────────────────────
 function afficherPhoto(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -881,7 +976,11 @@ function afficherPhoto(event) {
     reader.readAsDataURL(file);
 }
 
-// ─── Theme ───────────────────────────────────────────────────────────────────
+// ── Changement de thème de couleurs ─────────────────────────
+// Retire la classe "selected" de tous les swatches,
+// l'ajoute au swatch cliqué, met à jour currentTheme
+// et régénère le CV.
+// ─────────────────────────────────────────────────────────────
 function changerCouleur(swatch) {
     document.querySelectorAll('.palette-swatch').forEach(s => s.classList.remove('selected'));
     swatch.classList.add('selected');
@@ -893,7 +992,11 @@ function changerCouleur(swatch) {
     mettreAJourCV();
 }
 
-// ─── Add entries ─────────────────────────────────────────────────────────────
+// ── Création des cartes dynamiques ──────────────────────────
+// Chaque fonction crée un élément DOM avec ses champs,
+// l'ajoute au conteneur correspondant et déclenche la mise à jour.
+// Le bouton × supprime la carte parente et rafraîchit le CV.
+// ─────────────────────────────────────────────────────────────
 function creerExperienceCard(data={}) {
     const div = document.createElement('div');
     div.className = 'entry-card';
@@ -952,6 +1055,9 @@ function ajouterLangue(data={}) {
     document.getElementById('langues').appendChild(creerLangueCard(data));
 }
 
+// Échange le contenu HTML des blocs Formations et Expériences.
+// Les événements oninput/onchange sont re-bindés manuellement
+// car innerHTML écrase les attributs de gestionnaires.
 function interchangerFormationsExperiences() {
     const fe = document.getElementById('formations');
     const ex = document.getElementById('experiences');
@@ -964,12 +1070,21 @@ function interchangerFormationsExperiences() {
     mettreAJourCV();
 }
 
-// ─── Generate CV ──────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// GÉNÉRATION DE LA PRÉVISUALISATION CV
+// mettreAJourCV() est le point d'entrée appelé à chaque
+// modification d'un champ. Elle appelle :
+//   1. genererPagesCV()         → reconstruit le HTML du CV
+//   2. verifierConseilInterchange() → affiche ou cache le conseil
+// ═══════════════════════════════════════════════════════════
 function mettreAJourCV() {
     genererPagesCV();
     verifierConseilInterchange();
 }
 
+// Affiche le bandeau conseil et met en surbrillance le bouton
+// "Interchanger" si le nombre de formations dépasse celui
+// des expériences professionnelles.
 function verifierConseilInterchange() {
     const nbExp = document.querySelectorAll('#experiences .entry-card').length;
     const nbForm = document.querySelectorAll('#formations .entry-card').length;
@@ -984,11 +1099,19 @@ function verifierConseilInterchange() {
     }
 }
 
+// Retourne le src base64 de la photo si elle a été chargée,
+// sinon null. Utilisé lors de la construction du HTML du CV.
 function getPhotoSrc() {
     const img = document.querySelector('#photo-preview img');
     return img ? img.src : null;
 }
 
+// Reconstruit entièrement la prévisualisation CV à partir
+// des valeurs du formulaire. Crée :
+//   - la sidebar (photo, nom, contact, langues, compétences)
+//   - la zone principale (accroche, expériences, formations)
+// Les couleurs du thème sont injectées en inline style
+// pour être fidèlement exportées en PDF.
 function genererPagesCV() {
     const preview = document.getElementById('cv-preview-container');
     preview.innerHTML = '';
@@ -1009,7 +1132,10 @@ function genererPagesCV() {
 
     const T = currentTheme;
 
-    // Expériences
+    // ── Lecture des cartes Expériences ───────────────────────
+    // On parcourt chaque .entry-card du bloc #experiences
+    // et on construit un tableau d'objets {poste, entreprise, periode, description}.
+    // Les cartes vides (sans poste ni description) sont ignorées.
     const expCards = document.querySelectorAll('#experiences .entry-card');
     const exps = [];
     expCards.forEach(card => {
@@ -1020,7 +1146,8 @@ function genererPagesCV() {
         if (poste || entreprise || description) exps.push({ poste, entreprise, periode, description });
     });
 
-    // Formations
+    // ── Lecture des cartes Formations ────────────────────────
+    // Même logique que pour les expériences.
     const formCards = document.querySelectorAll('#formations .entry-card');
     const forms = [];
     formCards.forEach(card => {
@@ -1030,7 +1157,8 @@ function genererPagesCV() {
         if (diplome || etablissement) forms.push({ diplome, etablissement, annee });
     });
 
-    // Langues
+    // ── Lecture des cartes Langues ───────────────────────────
+    // Récupère le nom de la langue et le niveau sélectionné.
     const langCards = document.querySelectorAll('#langues .entry-card');
     const langs = [];
     langCards.forEach(card => {
@@ -1039,7 +1167,9 @@ function genererPagesCV() {
         if (nom) langs.push({ nom, niveau });
     });
 
-    // Warning multipage
+    // ── Détection contenu multipage ──────────────────────────
+    // Estimation grossière de la longueur totale du contenu.
+    // Si > 1200 caractères, un avertissement s'affiche dans le CV.
     let totalLen = accroche.length + skills.join(',').length;
     exps.forEach(e => totalLen += e.poste.length + e.entreprise.length + e.description.length);
     forms.forEach(f => totalLen += f.diplome.length + f.etablissement.length);
@@ -1048,7 +1178,9 @@ function genererPagesCV() {
     const page = document.createElement('div');
     page.className = 'cv-page';
 
-    // Build sidebar HTML
+    // ── Construction de la sidebar (colonne gauche du CV) ────
+    // Le style de fond est injecté en inline pour suivre le thème.
+    // Chaque info (adresse, email, etc.) n'est rendue que si elle est remplie.
     const sidebarStyle = `style="background:${T.primary}; --cv-accent:${T.secondary};"`;
     let sidebarHTML = `
     <div class="cv-sidebar" ${sidebarStyle}>
@@ -1079,7 +1211,9 @@ function genererPagesCV() {
         ` : ''}
     </div>`;
 
-    // Build main HTML
+    // ── Construction de la zone principale (colonne droite) ──
+    // Les variables CSS --cv-accent et --cv-accent2 sont injectées
+    // en inline style pour que les couleurs soient capturées par html2canvas.
     const mainAccentStyle = `style="--cv-accent:${T.secondary}; --cv-accent2:${T.accent2};"`;
     let mainHTML = `<div class="cv-main" ${mainAccentStyle}>`;
 
@@ -1121,7 +1255,12 @@ function genererPagesCV() {
     preview.appendChild(page);
 }
 
-// ─── PDF ──────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// GÉNÉRATION DU PDF
+// Utilise html2canvas pour capturer chaque .cv-page en image,
+// puis jsPDF pour assembler les pages en un fichier A4.
+// Le nom du fichier est basé sur le nom saisi dans le formulaire.
+// ═══════════════════════════════════════════════════════════
 async function genererPDF() {
     const { jsPDF } = window.jspdf;
     const pages = document.querySelectorAll('.cv-page');
@@ -1147,7 +1286,14 @@ async function genererPDF() {
 }
 
 
-// ─── Données suggestions ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// BASE DE DONNÉES DES PHRASES D'ACCROCHE SUGGÉRÉES
+// Tableau d'objets avec 3 propriétés :
+//   metier : nom affiché dans la modal
+//   cat    : catégorie pour le filtre (ex: "Santé", "Commerce")
+//   texte  : la phrase d'accroche complète prête à l'emploi
+// CATS est déduit automatiquement pour remplir les boutons de filtre.
+// ═══════════════════════════════════════════════════════════
 const SUGGESTIONS = [
   // Santé
   { metier: "Infirmier(ère)", cat: "Santé", texte: "Infirmier(ère) diplômé(e) d'État, je m'engage chaque jour au service des patients avec rigueur, empathie et réactivité. Mon expérience en milieu hospitalier m'a permis de développer de solides compétences cliniques ainsi qu'une capacité à travailler en équipe pluridisciplinaire dans des environnements exigeants." },
@@ -1239,7 +1385,17 @@ const SUGGESTIONS = [
 
 const CATS = [...new Set(SUGGESTIONS.map(s => s.cat))];
 
-// ─── Modal logic ──────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// LOGIQUE DE LA MODAL SUGGESTIONS
+// ouvrirModal()      : affiche l'overlay, pré-remplit la recherche
+//                      avec le métier saisi si disponible
+// fermerModal()      : cache l'overlay
+// renderCats()       : génère les boutons de filtre par catégorie
+// filtrerParCat()    : active un filtre catégorie et relance le rendu
+// filtrerSuggestions(): filtre par texte libre (métier ou contenu)
+// renderSuggestions(): injecte les cartes de suggestions dans la liste
+// utiliserSuggestion(): copie le texte dans le champ accroche
+// ═══════════════════════════════════════════════════════════
 let activeFilter = null;
 
 function ouvrirModal() {
@@ -1248,7 +1404,7 @@ function ouvrirModal() {
     document.getElementById('modal-search-input').value = '';
     renderCats();
     renderSuggestions();
-    // pre-filter on current métier
+    // Pré-remplit la recherche avec le métier saisi dans le formulaire
     const metier = document.getElementById('metier').value.trim().toLowerCase();
     if (metier) {
         document.getElementById('modal-search-input').value = metier;
@@ -1279,7 +1435,7 @@ function filtrerSuggestions() {
     if (activeFilter) items = items.filter(s => s.cat === activeFilter);
     if (q) items = items.filter(s => s.metier.toLowerCase().includes(q) || s.texte.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q));
     renderSuggestions(items);
-    // badge
+    // Affiche ou cache le badge de recherche active dans l'en-tête de la modal
     const badge = document.getElementById('modal-badge');
     if (q) { badge.textContent = q; badge.style.display = 'inline'; }
     else { badge.style.display = 'none'; }
@@ -1311,7 +1467,12 @@ function utiliserSuggestion(idx) {
     textarea.focus();
 }
 
-// ─── Auto-detect métier ───────────────────────────────────────────────────────
+// ── Détection automatique du métier ─────────────────────────
+// Appelée à chaque frappe dans le champ Métier.
+// Si le métier saisi correspond (ou ressemble) à un métier
+// de la base SUGGESTIONS, un lien discret apparaît sous le
+// champ accroche pour inviter l'utilisateur à consulter les suggestions.
+// ─────────────────────────────────────────────────────────────
 function detecterMetier() {
     const metier = document.getElementById('metier').value.trim().toLowerCase();
     const hint = document.getElementById('hint-suggestions');
@@ -1332,16 +1493,26 @@ function detecterMetier() {
     }
 }
 
-// Close on Escape
+// Ferme la modal si l'utilisateur appuie sur la touche Échap
 document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerModal(); });
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════
+// INITIALISATION AU CHARGEMENT DE LA PAGE
+// Crée une carte expérience et une carte formation vides par défaut,
+// puis génère une première prévisualisation du CV.
+// ═══════════════════════════════════════════════════════════
 ajouterExperience();
 ajouterFormation();
 mettreAJourCV();
 </script>
 
-<!-- Modal suggestions (at body level to avoid stacking context issues) -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL SUGGESTIONS DE PHRASES D'ACCROCHE
+     Placée directement dans <body> (pas dans .form-panel)
+     pour éviter que le overflow:auto du panneau formulaire
+     ne crée un stacking context qui empêcherait position:fixed
+     de couvrir tout l'écran, y compris la prévisualisation PDF.
+══════════════════════════════════════════════════════════ -->
 <div id="suggestions-overlay" class="suggestions-overlay" style="display:none;" onclick="if(event.target===this)fermerModal()">
     <div class="suggestions-modal">
         <div class="modal-header">
