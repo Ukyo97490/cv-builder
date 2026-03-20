@@ -4,78 +4,966 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DG-CV Builder</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<link rel="stylesheet" href="css/styles.css">
+<style>
+:root {
+    --primary: #1a1a2e;
+    --accent: #e94560;
+    --accent2: #0f3460;
+    --surface: #ffffff;
+    --surface2: #f5f5f7;
+    --border: #e8e8ec;
+    --text: #1a1a2e;
+    --text-muted: #7a7a8c;
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #ffffff;
+    --cv-accent: #e94560;
+    --cv-accent2: #0f3460;
+    --radius: 12px;
+    --shadow: 0 4px 24px rgba(26,26,46,0.10);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f0f5;
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+
+}
+
+
+/* Header */
+.app-header {
+    background: var(--primary);
+    padding: 18px 40px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+}
+.app-header .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: white;
+}
+.app-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: white;
+    letter-spacing: -0.5px;
+}
+.app-header .tagline {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    margin-left: auto;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.5px;
+}
+
+/* Layout */
+.workspace {
+    display: grid;
+    grid-template-columns: 420px 1fr;
+    gap: 0;
+    min-height: calc(100vh - 72px);
+}
+
+/* Sidebar Form */
+.form-panel {
+    background: var(--surface);
+    overflow-y: auto;
+    height: calc(100vh - 72px);
+    position: sticky;
+    top: 72px;
+    border-right: 1px solid var(--border);
+}
+
+.form-inner {
+    padding: 28px 24px 60px;
+}
+
+/* Section headings */
+.section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: var(--primary);
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.section-title i {
+    color: var(--accent);
+    font-size: 0.9rem;
+}
+.section-title:first-child { margin-top: 0; }
+
+/* Photo upload */
+.photo-zone {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: var(--radius);
+    border: 1.5px dashed var(--border);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+.photo-zone:hover {
+    border-color: var(--accent);
+    background: #fff5f7;
+}
+.photo-circle {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.photo-circle img { width: 100%; height: 100%; object-fit: cover; }
+.photo-circle i { font-size: 1.6rem; color: var(--text-muted); }
+.photo-label { flex: 1; }
+.photo-label strong { display: block; font-size: 0.88rem; color: var(--text); margin-bottom: 3px; }
+.photo-label span { font-size: 0.78rem; color: var(--text-muted); }
+input[type="file"] { display: none; }
+
+/* Form fields */
+.field-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.field-group.single { grid-template-columns: 1fr; }
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+.field label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.field input, .field textarea, .field select {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    background: var(--surface);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    width: 100%;
+}
+.field input:focus, .field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(233,69,96,0.08);
+}
+.field textarea { resize: vertical; min-height: 72px; }
+
+/* Checkbox */
+.checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0 12px;
+    font-size: 0.88rem;
+    cursor: pointer;
+}
+.checkbox-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--accent);
+    cursor: pointer;
+}
+
+/* Color palette */
+.palette {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 14px 0 20px;
+}
+.palette-swatch {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+    position: relative;
+}
+.palette-swatch:hover { transform: scale(1.15); }
+.palette-swatch.selected {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--accent);
+}
+.palette-swatch .swatch-label {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    white-space: nowrap;
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+/* Dynamic entries */
+.entry-card {
+    background: var(--surface2);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    border: 1.5px solid var(--border);
+    position: relative;
+    transition: border-color 0.2s;
+}
+.entry-card:hover { border-color: var(--cv-accent); }
+.entry-card .remove-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+}
+.entry-card .remove-btn:hover { color: var(--accent); background: rgba(233,69,96,0.08); }
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1.5px solid var(--border);
+}
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-primary {
+    background: var(--accent);
+    color: white;
+}
+.btn-primary:hover { background: #c73652; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(233,69,96,0.35); }
+.btn-secondary {
+    background: var(--primary);
+    color: white;
+}
+.btn-secondary:hover { background: #2c2c50; }
+.btn-outline {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1.5px dashed var(--border);
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(233,69,96,0.04); }
+
+.actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+}
+
+/* Preview */
+.preview-panel {
+    padding: 40px;
+    overflow-y: auto;
+    background: #e8e8ef;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+.preview-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    padding: 10px 18px;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 20px;
+    z-index: 10;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+.preview-toolbar .scale-info {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+}
+
+/* CV Page */
+.cv-page {
+    width: 210mm;
+    min-height: 297mm;
+    background: white;
+    display: flex;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.cv-sidebar {
+    width: 32%;
+    background: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 32px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex-shrink: 0;
+}
+
+.cv-photo-wrap {
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid rgba(255,255,255,0.25);
+    margin: 0 auto 16px;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+}
+.cv-photo-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.cv-photo-wrap i { font-size: 2.5rem; opacity: 0.3; }
+
+.cv-sidebar .cv-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+    margin-bottom: 4px;
+    color: white;
+}
+.cv-sidebar .cv-job {
+    font-size: 0.78rem;
+    text-align: center;
+    opacity: 0.7;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+.cv-sidebar .cv-section-title {
+    font-size: 0.65rem;
+    letter-spacing: 1.8px;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin: 18px 0 10px;
+    font-weight: 600;
+}
+
+.cv-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.78rem;
+    opacity: 0.85;
+    margin-bottom: 7px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+.cv-contact-item i {
+    color: var(--cv-accent);
+    width: 12px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    font-size: 0.72rem;
+}
+
+.cv-skills-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 4px;
+}
+.cv-skill-tag {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.9);
+    font-size: 0.72rem;
+    padding: 3px 9px;
+    border-radius: 30px;
+}
+
+/* CV Main */
+.cv-main {
+    flex: 1;
+    padding: 32px 28px;
+    background: white;
+    overflow: hidden;
+}
+
+.cv-accroche {
+    background: linear-gradient(135deg, #f8f8fc 0%, #f0f0f8 100%);
+    border-left: 3px solid var(--cv-accent);
+    padding: 12px 16px;
+    margin-bottom: 22px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.82rem;
+    line-height: 1.55;
+    color: #444;
+    font-style: italic;
+}
+
+.cv-main-section {
+    margin-bottom: 22px;
+}
+.cv-main-section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    color: var(--cv-accent2);
+    margin-bottom: 12px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid var(--cv-accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.cv-main-section-title::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--cv-accent);
+    flex-shrink: 0;
+}
+
+.cv-entry {
+    margin-bottom: 12px;
+    padding-left: 12px;
+    border-left: 2px solid rgba(233,69,96,0.18);
+    position: relative;
+}
+.cv-entry::before {
+    content: '';
+    position: absolute;
+    left: -4px; top: 6px;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--cv-accent);
+}
+.cv-entry-title {
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: var(--cv-accent2);
+    margin-bottom: 2px;
+}
+.cv-entry-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-style: italic;
+}
+.cv-entry-desc {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.cv-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 0.78rem;
+    margin-bottom: 14px;
+    border-left: 3px solid #ffc107;
+}
+
+/* Scrollbar */
+.form-panel::-webkit-scrollbar { width: 4px; }
+.form-panel::-webkit-scrollbar-track { background: transparent; }
+.form-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Animations */
+.entry-card { animation: slideIn 0.2s ease; }
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive scale for preview */
+@media (max-width: 1100px) {
+    .workspace { grid-template-columns: 1fr; }
+    .form-panel { height: auto; position: static; }
+    .cv-page { transform: scale(0.65); transform-origin: top center; }
+}
+</style>
 </head>
 <body>
-<h1 style="text-align:center;">DG-CV Builder</h1>
-<div class="container">
-    <div class="form-container">
-        <h2>Informations personnelles</h2>
-        <input type="file" id="photo" accept="image/*" style="display:none;" onchange="afficherPhoto(event)"/>
-        <label for="photo" style="display:block; text-align:center; cursor:pointer;">
-            <div class="photo-upload" id="photo-preview"><i class="fas fa-camera" style="font-size:2em; color:#7f8c8d;"></i></div>
-            <p>Cliquez pour ajouter une photo</p>
-        </label>
-        <input type="text" id="nom" placeholder="Nom et prénom" oninput="mettreAJourCV()"/>
-        <input type="text" id="metier" placeholder="Métier" oninput="mettreAJourCV()"/>
-        <input type="text" id="adresse" placeholder="Adresse" oninput="mettreAJourCV()"/>
-        <input type="text" id="email" placeholder="Email" oninput="mettreAJourCV()"/>
-        <input type="text" id="telephone" placeholder="Téléphone" oninput="mettreAJourCV()"/>
-        <input type="text" id="naissance" placeholder="Date de naissance" oninput="mettreAJourCV()"/>
-        <div class="inline-checkbox">
-            <input type="checkbox" id="permis" onchange="mettreAJourCV()"/>
-            <label for="permis">Permis de conduire</label>
-        </div>
 
-        <div class="accroche-container">
-            <h2>Phrase d'accroche</h2>
-            <textarea id="accroche" placeholder="Votre phrase d'accroche ou motivation" oninput="mettreAJourCV()"></textarea>
-        </div>
+<header class="app-header">
+    <div class="logo-icon"><i class="fas fa-file-alt"></i></div>
+    <h1>DG-CV Builder</h1>
+    <span class="tagline">Créateur de CV professionnel · v2.0</span>
+</header>
 
-        <h2>Thème de couleurs</h2>
-        <div class="color-palette">
-            <div class="color-option selected" style="background:#2c3e50;" data-primary="#2c3e50" data-secondary="#3498db" onclick="changerCouleur(this)"></div>
-            <div class="color-option" style="background:#a21f51;" data-primary="#a21f51" data-secondary="#e91e63" onclick="changerCouleur(this)"></div>
-            <div class="color-option" style="background:#2e7d32;" data-primary="#2e7d32" data-secondary="#4caf50" onclick="changerCouleur(this)"></div>
-        </div>
+<div class="workspace">
+    <!-- FORM PANEL -->
+    <aside class="form-panel">
+        <div class="form-inner">
 
-        <h2>Expérience</h2>
-        <div id="experiences">
-            <div class="experience">
-                <input type="text" class="poste" placeholder="Poste" oninput="mettreAJourCV()"/>
-                <input type="text" class="entreprise" placeholder="Entreprise" oninput="mettreAJourCV()"/>
-                <input type="text" class="periode" placeholder="Période" oninput="mettreAJourCV()"/>
-                <textarea class="description" placeholder="Description" rows="3" oninput="mettreAJourCV()"></textarea>
+            <!-- Photo -->
+            <div class="section-title"><i class="fas fa-user"></i> Informations personnelles</div>
+
+            <input type="file" id="photo" accept="image/*" onchange="afficherPhoto(event)"/>
+            <label for="photo">
+                <div class="photo-zone">
+                    <div class="photo-circle" id="photo-preview">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <div class="photo-label">
+                        <strong>Photo de profil</strong>
+                        <span>Cliquez pour ajouter · JPG, PNG</span>
+                    </div>
+                    <i class="fas fa-upload" style="color:var(--text-muted);font-size:0.9rem;"></i>
+                </div>
+            </label>
+
+            <div class="field-group">
+                <div class="field">
+                    <label>Nom et prénom</label>
+                    <input type="text" id="nom" placeholder="Prénom Nom" oninput="mettreAJourCV()"/>
+                </div>
+                <div class="field">
+                    <label>Métier / Titre</label>
+                    <input type="text" id="metier" placeholder="Votre métier" oninput="mettreAJourCV()"/>
+                </div>
             </div>
-        </div>
-        <button onclick="ajouterExperience()"><i class="fas fa-plus"></i> Ajouter une expérience</button>
 
-        <h2>Formations</h2>
-        <div id="formations">
-            <div class="formation">
-                <input type="text" class="diplome" placeholder="Diplôme" oninput="mettreAJourCV()"/>
-                <input type="text" class="etablissement" placeholder="Établissement" oninput="mettreAJourCV()"/>
-                <input type="text" class="annee" placeholder="Année" oninput="mettreAJourCV()"/>
+            <div class="field">
+                <label>Adresse</label>
+                <input type="text" id="adresse" placeholder="Votre adresse" oninput="mettreAJourCV()"/>
             </div>
+
+            <div class="field-group">
+                <div class="field">
+                    <label>Email</label>
+                    <input type="text" id="email" placeholder="votre@email.fr" oninput="mettreAJourCV()"/>
+                </div>
+                <div class="field">
+                    <label>Téléphone</label>
+                    <input type="text" id="telephone" placeholder="+33 6 00 00 00 00" oninput="mettreAJourCV()"/>
+                </div>
+            </div>
+
+            <div class="field-group">
+                <div class="field">
+                    <label>Date de naissance</label>
+                    <input type="text" id="naissance" placeholder="01/01/1995" oninput="mettreAJourCV()"/>
+                </div>
+                <div class="field">
+                    <label>Nationalité</label>
+                    <input type="text" id="nationalite" placeholder="Française" oninput="mettreAJourCV()"/>
+                </div>
+            </div>
+
+            <label class="checkbox-row">
+                <input type="checkbox" id="permis" onchange="mettreAJourCV()"/>
+                <span>Permis de conduire</span>
+            </label>
+
+            <!-- Phrase d'accroche -->
+            <div class="section-title"><i class="fas fa-quote-left"></i> Phrase d'accroche</div>
+            <div class="field single">
+                <label>Résumé / motivation</label>
+                <textarea id="accroche" placeholder="Présentez-vous en quelques phrases : votre parcours, vos valeurs, vos objectifs professionnels..." oninput="mettreAJourCV()" style="min-height:90px;"></textarea>
+            </div>
+
+            <!-- Thème -->
+            <div class="section-title"><i class="fas fa-palette"></i> Thème de couleurs</div>
+            <div class="palette">
+                <div class="palette-swatch selected" style="background:#1a1a2e;" data-primary="#1a1a2e" data-secondary="#e94560" data-accent2="#0f3460" onclick="changerCouleur(this)" title="Nuit de Paris">
+                    <span class="swatch-label">Nuit</span>
+                </div>
+                <div class="palette-swatch" style="background:#1b4332;" data-primary="#1b4332" data-secondary="#52b788" data-accent2="#2d6a4f" onclick="changerCouleur(this)" title="Forêt">
+                    <span class="swatch-label">Forêt</span>
+                </div>
+                <div class="palette-swatch" style="background:#2d3561;" data-primary="#2d3561" data-secondary="#c84b31" data-accent2="#1b1f3b" onclick="changerCouleur(this)" title="Cobalt">
+                    <span class="swatch-label">Cobalt</span>
+                </div>
+                <div class="palette-swatch" style="background:#3d2b1f;" data-primary="#3d2b1f" data-secondary="#d4a853" data-accent2="#5c3d2e" onclick="changerCouleur(this)" title="Sépia">
+                    <span class="swatch-label">Sépia</span>
+                </div>
+                <div class="palette-swatch" style="background:#2c2c54;" data-primary="#2c2c54" data-secondary="#ff5f40" data-accent2="#40407a" onclick="changerCouleur(this)" title="Flamme">
+                    <span class="swatch-label">Flamme</span>
+                </div>
+                <div class="palette-swatch" style="background:#1a1a1a;" data-primary="#1a1a1a" data-secondary="#c0c0c0" data-accent2="#333333" onclick="changerCouleur(this)" title="Monochrome">
+                    <span class="swatch-label">Mono</span>
+                </div>
+            </div>
+
+            <!-- Expériences -->
+            <div class="section-title"><i class="fas fa-briefcase"></i> Expériences professionnelles</div>
+            <div id="experiences"></div>
+            <button class="btn btn-outline" onclick="ajouterExperience()">
+                <i class="fas fa-plus"></i> Ajouter une expérience
+            </button>
+
+            <!-- Formations -->
+            <div class="section-title"><i class="fas fa-graduation-cap"></i> Formations</div>
+            <div id="formations"></div>
+            <button class="btn btn-outline" onclick="ajouterFormation()">
+                <i class="fas fa-plus"></i> Ajouter une formation
+            </button>
+
+            <!-- Langues -->
+            <div class="section-title"><i class="fas fa-language"></i> Langues</div>
+            <div id="langues"></div>
+            <button class="btn btn-outline" onclick="ajouterLangue()">
+                <i class="fas fa-plus"></i> Ajouter une langue
+            </button>
+
+            <!-- Compétences -->
+            <div class="section-title"><i class="fas fa-tools"></i> Compétences & Qualités</div>
+            <div class="field single">
+                <label>Séparées par des virgules</label>
+                <textarea id="skills" placeholder="Ex : Travail en équipe, Rigueur, Gestion de projet, Bureautique..." oninput="mettreAJourCV()"></textarea>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-row">
+                <button class="btn btn-secondary" onclick="interchangerFormationsExperiences()">
+                    <i class="fas fa-exchange-alt"></i> Interchanger Formations/Expériences
+                </button>
+                <button class="btn btn-primary" onclick="genererPDF()">
+                    <i class="fas fa-file-pdf"></i> Télécharger PDF
+                </button>
+            </div>
+
         </div>
-        <button onclick="ajouterFormation()"><i class="fas fa-plus"></i> Ajouter une formation</button>
+    </aside>
 
-        <h2>Compétences et qualités</h2>
-        <textarea id="skills" placeholder="Séparez les compétences par des virgules" oninput="mettreAJourCV()"></textarea>
-
-        <button onclick="interchangerFormationsExperiences()">Interchanger Formations / Expériences</button>
-        <button onclick="genererPDF()"><i class="fas fa-file-pdf"></i> Télécharger le CV en PDF</button>
-    </div>
-
-    <div class="cv-preview" id="cv-preview-container">
-        <!-- Pages générées dynamiquement -->
-    </div>
+    <!-- PREVIEW PANEL -->
+    <main class="preview-panel">
+        <div class="preview-toolbar">
+            <i class="fas fa-eye" style="color:var(--accent);"></i>
+            Prévisualisation en temps réel
+            <span class="scale-info">· Format A4</span>
+        </div>
+        <div id="cv-preview-container"></div>
+    </main>
 </div>
 
-<script src="js/script.js"></script>
+<script>
+// ─── State ───────────────────────────────────────────────────────────────────
+let currentTheme = {
+    primary: '#1a1a2e',
+    secondary: '#e94560',
+    accent2: '#0f3460'
+};
+
+// ─── Photo ───────────────────────────────────────────────────────────────────
+function afficherPhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const src = e.target.result;
+        document.getElementById('photo-preview').innerHTML = `<img src="${src}" alt="Photo"/>`;
+        mettreAJourCV();
+    };
+    reader.readAsDataURL(file);
+}
+
+// ─── Theme ───────────────────────────────────────────────────────────────────
+function changerCouleur(swatch) {
+    document.querySelectorAll('.palette-swatch').forEach(s => s.classList.remove('selected'));
+    swatch.classList.add('selected');
+    currentTheme = {
+        primary: swatch.dataset.primary,
+        secondary: swatch.dataset.secondary,
+        accent2: swatch.dataset.accent2 || swatch.dataset.primary
+    };
+    mettreAJourCV();
+}
+
+// ─── Add entries ─────────────────────────────────────────────────────────────
+function creerExperienceCard(data={}) {
+    const div = document.createElement('div');
+    div.className = 'entry-card';
+    div.innerHTML = `
+        <button class="remove-btn" onclick="this.closest('.entry-card').remove(); mettreAJourCV();"><i class="fas fa-times"></i></button>
+        <div class="field-group">
+            <div class="field"><label>Poste</label><input type="text" class="poste" placeholder="Intitulé du poste" value="${data.poste||''}" oninput="mettreAJourCV()"/></div>
+            <div class="field"><label>Entreprise</label><input type="text" class="entreprise" placeholder="Nom de l'entreprise" value="${data.entreprise||''}" oninput="mettreAJourCV()"/></div>
+        </div>
+        <div class="field"><label>Période</label><input type="text" class="periode" placeholder="Ex : Jan 2022 – Déc 2023" value="${data.periode||''}" oninput="mettreAJourCV()"/></div>
+        <div class="field single"><label>Description</label><textarea class="description" placeholder="Décrivez vos missions et réalisations..." oninput="mettreAJourCV()">${data.description||''}</textarea></div>
+    `;
+    return div;
+}
+
+function ajouterExperience(data={}) {
+    document.getElementById('experiences').appendChild(creerExperienceCard(data));
+}
+
+function creerFormationCard(data={}) {
+    const div = document.createElement('div');
+    div.className = 'entry-card';
+    div.innerHTML = `
+        <button class="remove-btn" onclick="this.closest('.entry-card').remove(); mettreAJourCV();"><i class="fas fa-times"></i></button>
+        <div class="field-group">
+            <div class="field"><label>Diplôme</label><input type="text" class="diplome" placeholder="Nom du diplôme" value="${data.diplome||''}" oninput="mettreAJourCV()"/></div>
+            <div class="field"><label>Établissement</label><input type="text" class="etablissement" placeholder="Nom de l'établissement" value="${data.etablissement||''}" oninput="mettreAJourCV()"/></div>
+        </div>
+        <div class="field"><label>Année</label><input type="text" class="annee" placeholder="2020" value="${data.annee||''}" oninput="mettreAJourCV()"/></div>
+    `;
+    return div;
+}
+
+function ajouterFormation(data={}) {
+    document.getElementById('formations').appendChild(creerFormationCard(data));
+}
+
+function creerLangueCard(data={}) {
+    const div = document.createElement('div');
+    div.className = 'entry-card';
+    div.innerHTML = `
+        <button class="remove-btn" onclick="this.closest('.entry-card').remove(); mettreAJourCV();"><i class="fas fa-times"></i></button>
+        <div class="field-group">
+            <div class="field"><label>Langue</label><input type="text" class="langue-nom" placeholder="Anglais" value="${data.nom||''}" oninput="mettreAJourCV()"/></div>
+            <div class="field"><label>Niveau</label>
+                <select class="langue-niveau" onchange="mettreAJourCV()">
+                    ${['A1','A2','B1','B2','C1','C2','Natif'].map(n=>`<option ${(data.niveau||'B2')===n?'selected':''}>${n}</option>`).join('')}
+                </select>
+            </div>
+        </div>
+    `;
+    return div;
+}
+
+function ajouterLangue(data={}) {
+    document.getElementById('langues').appendChild(creerLangueCard(data));
+}
+
+function interchangerFormationsExperiences() {
+    const fe = document.getElementById('formations');
+    const ex = document.getElementById('experiences');
+    const tempF = fe.innerHTML;
+    fe.innerHTML = ex.innerHTML;
+    ex.innerHTML = tempF;
+    // Rebind events
+    fe.querySelectorAll('input,textarea,select').forEach(el => { el.oninput = mettreAJourCV; el.onchange = mettreAJourCV; });
+    ex.querySelectorAll('input,textarea,select').forEach(el => { el.oninput = mettreAJourCV; el.onchange = mettreAJourCV; });
+    mettreAJourCV();
+}
+
+// ─── Generate CV ──────────────────────────────────────────────────────────────
+function mettreAJourCV() {
+    genererPagesCV();
+}
+
+function getPhotoSrc() {
+    const img = document.querySelector('#photo-preview img');
+    return img ? img.src : null;
+}
+
+function genererPagesCV() {
+    const preview = document.getElementById('cv-preview-container');
+    preview.innerHTML = '';
+
+    const nom = document.getElementById('nom').value || 'Nom Prénom';
+    const metier = document.getElementById('metier').value || 'Métier';
+    const adresse = document.getElementById('adresse').value;
+    const email = document.getElementById('email').value;
+    const telephone = document.getElementById('telephone').value;
+    const naissance = document.getElementById('naissance').value;
+    const nationalite = document.getElementById('nationalite').value;
+    const permis = document.getElementById('permis').checked;
+    const accroche = document.getElementById('accroche').value;
+    const skillsRaw = document.getElementById('skills').value;
+    const skills = skillsRaw ? skillsRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    const photoSrc = getPhotoSrc();
+
+    const T = currentTheme;
+
+    // Expériences
+    const expCards = document.querySelectorAll('#experiences .entry-card');
+    const exps = [];
+    expCards.forEach(card => {
+        const poste = card.querySelector('.poste')?.value || '';
+        const entreprise = card.querySelector('.entreprise')?.value || '';
+        const periode = card.querySelector('.periode')?.value || '';
+        const description = card.querySelector('.description')?.value || '';
+        if (poste || entreprise || description) exps.push({ poste, entreprise, periode, description });
+    });
+
+    // Formations
+    const formCards = document.querySelectorAll('#formations .entry-card');
+    const forms = [];
+    formCards.forEach(card => {
+        const diplome = card.querySelector('.diplome')?.value || '';
+        const etablissement = card.querySelector('.etablissement')?.value || '';
+        const annee = card.querySelector('.annee')?.value || '';
+        if (diplome || etablissement) forms.push({ diplome, etablissement, annee });
+    });
+
+    // Langues
+    const langCards = document.querySelectorAll('#langues .entry-card');
+    const langs = [];
+    langCards.forEach(card => {
+        const nom = card.querySelector('.langue-nom')?.value || '';
+        const niveau = card.querySelector('.langue-niveau')?.value || '';
+        if (nom) langs.push({ nom, niveau });
+    });
+
+    // Warning multipage
+    let totalLen = accroche.length + skills.join(',').length;
+    exps.forEach(e => totalLen += e.poste.length + e.entreprise.length + e.description.length);
+    forms.forEach(f => totalLen += f.diplome.length + f.etablissement.length);
+    const showWarning = totalLen > 1200;
+
+    const page = document.createElement('div');
+    page.className = 'cv-page';
+
+    // Build sidebar HTML
+    const sidebarStyle = `style="background:${T.primary}; --cv-accent:${T.secondary};"`;
+    let sidebarHTML = `
+    <div class="cv-sidebar" ${sidebarStyle}>
+        <div class="cv-photo-wrap">
+            ${photoSrc ? `<img src="${photoSrc}" alt="Photo"/>` : `<i class="fas fa-user"></i>`}
+        </div>
+        <div class="cv-name">${nom}</div>
+        <div class="cv-job">${metier}</div>
+
+        <div class="cv-section-title">Contact</div>
+        ${adresse ? `<div class="cv-contact-item"><i class="fas fa-map-marker-alt"></i>${adresse}</div>` : ''}
+        ${email ? `<div class="cv-contact-item"><i class="fas fa-envelope"></i>${email}</div>` : ''}
+        ${telephone ? `<div class="cv-contact-item"><i class="fas fa-phone"></i>${telephone}</div>` : ''}
+        ${naissance ? `<div class="cv-contact-item"><i class="fas fa-birthday-cake"></i>${naissance}</div>` : ''}
+        ${nationalite ? `<div class="cv-contact-item"><i class="fas fa-flag"></i>${nationalite}</div>` : ''}
+        ${permis ? `<div class="cv-contact-item"><i class="fas fa-car"></i>Permis de conduire</div>` : ''}
+
+        ${langs.length ? `
+        <div class="cv-section-title">Langues</div>
+        ${langs.map(l => `<div class="cv-contact-item"><i class="fas fa-language"></i>${l.nom} <span style="opacity:0.55; margin-left:4px; font-size:0.7rem;">· ${l.niveau}</span></div>`).join('')}
+        ` : ''}
+
+        ${skills.length ? `
+        <div class="cv-section-title">Compétences</div>
+        <div class="cv-skills-list">
+            ${skills.map(s => `<span class="cv-skill-tag" style="border-color:${T.secondary}33; background:${T.secondary}18;">${s}</span>`).join('')}
+        </div>
+        ` : ''}
+    </div>`;
+
+    // Build main HTML
+    const mainAccentStyle = `style="--cv-accent:${T.secondary}; --cv-accent2:${T.accent2};"`;
+    let mainHTML = `<div class="cv-main" ${mainAccentStyle}>`;
+
+    if (showWarning) mainHTML += `<div class="cv-warning">⚠ Un CV multipage est déconseillé. Réduisez le contenu si possible.</div>`;
+
+    if (accroche) mainHTML += `<div class="cv-accroche" style="border-color:${T.secondary};">${accroche}</div>`;
+
+    if (exps.length) {
+        mainHTML += `<div class="cv-main-section">
+            <div class="cv-main-section-title" style="color:${T.accent2}; border-color:${T.secondary};">Expériences professionnelles</div>`;
+        exps.forEach(e => {
+            mainHTML += `
+            <div class="cv-entry" style="border-color:${T.secondary}44;">
+                <div class="cv-entry-title" style="color:${T.accent2};">${e.poste}</div>
+                <div class="cv-entry-sub">${e.entreprise}${e.periode ? ` · ${e.periode}` : ''}</div>
+                ${e.description ? `<div class="cv-entry-desc">${e.description}</div>` : ''}
+            </div>`;
+        });
+        mainHTML += `</div>`;
+    }
+
+    if (forms.length) {
+        mainHTML += `<div class="cv-main-section">
+            <div class="cv-main-section-title" style="color:${T.accent2}; border-color:${T.secondary};">Formations</div>`;
+        forms.forEach(f => {
+            mainHTML += `
+            <div class="cv-entry" style="border-color:${T.secondary}44;">
+                <div class="cv-entry-title" style="color:${T.accent2};">${f.diplome}</div>
+                <div class="cv-entry-sub">${f.etablissement}</div>
+                ${f.annee ? `<div class="cv-entry-desc">${f.annee}</div>` : ''}
+            </div>`;
+        });
+        mainHTML += `</div>`;
+    }
+
+    mainHTML += '</div>';
+
+    page.innerHTML = sidebarHTML + mainHTML;
+    preview.appendChild(page);
+}
+
+// ─── PDF ──────────────────────────────────────────────────────────────────────
+async function genererPDF() {
+    const { jsPDF } = window.jspdf;
+    const pages = document.querySelectorAll('.cv-page');
+    if (!pages.length) return;
+
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+    for (let i = 0; i < pages.length; i++) {
+        const canvas = await html2canvas(pages[i], {
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        if (i > 0) pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
+    }
+
+    const nom = document.getElementById('nom').value || 'cv';
+    pdf.save(`${nom.replace(/\s+/g, '_')}_CV.pdf`);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+ajouterExperience();
+ajouterFormation();
+mettreAJourCV();
+</script>
 </body>
 </html>
