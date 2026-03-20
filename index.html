@@ -34,9 +34,7 @@ body {
     color: var(--text);
     min-height: 100vh;
     padding: 0;
-
 }
-
 
 /* Header */
 .app-header {
@@ -293,6 +291,21 @@ input[type="file"] { display: none; }
     margin-top: 4px;
 }
 .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(233,69,96,0.04); }
+
+.btn-interchange-highlight {
+    background: linear-gradient(135deg, #f0a500, #e07b00) !important;
+    color: white !important;
+    box-shadow: 0 0 0 3px rgba(240,165,0,0.25), 0 4px 14px rgba(240,165,0,0.35) !important;
+    animation: pulse-orange 1.8s ease-in-out infinite;
+}
+.btn-interchange-highlight:hover {
+    background: linear-gradient(135deg, #e07b00, #c96800) !important;
+    transform: translateY(-1px);
+}
+@keyframes pulse-orange {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(240,165,0,0.25), 0 4px 14px rgba(240,165,0,0.35); }
+    50%       { box-shadow: 0 0 0 6px rgba(240,165,0,0.15), 0 6px 20px rgba(240,165,0,0.45); }
+}
 
 .actions-row {
     display: flex;
@@ -665,9 +678,20 @@ input[type="file"] { display: none; }
                 <textarea id="skills" placeholder="Ex : Travail en équipe, Rigueur, Gestion de projet, Bureautique..." oninput="mettreAJourCV()"></textarea>
             </div>
 
+            <!-- Conseil interchanger -->
+            <div id="conseil-interchange" style="display:none; background:#fffbe6; border:1.5px solid #f0c040; border-radius:10px; padding:12px 14px; margin-top:20px; font-size:0.82rem; color:#7a5c00; line-height:1.5; animation: slideIn 0.3s ease;">
+                <div style="display:flex; align-items:flex-start; gap:10px;">
+                    <i class="fas fa-lightbulb" style="color:#f0a500; margin-top:2px; flex-shrink:0;"></i>
+                    <div>
+                        <strong style="display:block; margin-bottom:3px;">Conseil de mise en page</strong>
+                        Vous avez plus de formations que d'expériences professionnelles. Pensez à mettre en avant ce qui vous distingue le plus : utilisez le bouton ci-dessous pour placer votre atout majeur en premier sur le CV.
+                    </div>
+                </div>
+            </div>
+
             <!-- Actions -->
             <div class="actions-row">
-                <button class="btn btn-secondary" onclick="interchangerFormationsExperiences()">
+                <button id="btn-interchange" class="btn btn-secondary" onclick="interchangerFormationsExperiences()">
                     <i class="fas fa-exchange-alt"></i> Interchanger Formations/Expériences
                 </button>
                 <button class="btn btn-primary" onclick="genererPDF()">
@@ -796,6 +820,21 @@ function interchangerFormationsExperiences() {
 // ─── Generate CV ──────────────────────────────────────────────────────────────
 function mettreAJourCV() {
     genererPagesCV();
+    verifierConseilInterchange();
+}
+
+function verifierConseilInterchange() {
+    const nbExp = document.querySelectorAll('#experiences .entry-card').length;
+    const nbForm = document.querySelectorAll('#formations .entry-card').length;
+    const conseil = document.getElementById('conseil-interchange');
+    const btn = document.getElementById('btn-interchange');
+    const afficher = nbForm > nbExp && nbForm > 0;
+    conseil.style.display = afficher ? 'block' : 'none';
+    if (afficher) {
+        btn.classList.add('btn-interchange-highlight');
+    } else {
+        btn.classList.remove('btn-interchange-highlight');
+    }
 }
 
 function getPhotoSrc() {
