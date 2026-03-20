@@ -545,6 +545,131 @@ input[type="file"] { display: none; }
     .form-panel { height: auto; position: static; }
     .cv-page { transform: scale(0.65); transform-origin: top center; }
 }
+
+/* ── Suggestions modal ─────────────────────────────────────────────────────── */
+.suggestions-overlay {
+    position: fixed; inset: 0;
+    background: rgba(10,10,30,0.55);
+    z-index: 1000;
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn 0.18s ease;
+    backdrop-filter: blur(3px);
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+.suggestions-modal {
+    background: #fff;
+    border-radius: 16px;
+    width: min(680px, 95vw);
+    max-height: 85vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.22);
+    animation: modalIn 0.22s cubic-bezier(0.34,1.56,0.64,1);
+    overflow: hidden;
+}
+@keyframes modalIn { from { opacity:0; transform: scale(0.93) translateY(20px); } to { opacity:1; transform: scale(1) translateY(0); } }
+
+.modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 12px;
+}
+.modal-header .modal-icon {
+    width: 38px; height: 38px;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; color: #f0a500; flex-shrink:0;
+}
+.modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--primary); flex:1; }
+.modal-header .modal-metier-badge {
+    background: var(--accent); color: white;
+    padding: 3px 10px; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600;
+}
+.modal-close {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-muted); font-size: 1rem; padding: 4px 8px;
+    border-radius: 6px; transition: background 0.2s, color 0.2s;
+}
+.modal-close:hover { background: var(--surface2); color: var(--text); }
+
+.modal-search {
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--border);
+}
+.modal-search input {
+    width: 100%; padding: 8px 12px 8px 36px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.85rem;
+    background: var(--surface2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a7a8c' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.35-4.35'/%3E%3C/svg%3E") no-repeat 12px center;
+    outline: none; transition: border-color 0.2s;
+}
+.modal-search input:focus { border-color: var(--accent); background-color: #fff; }
+
+.modal-cats {
+    display: flex; gap: 6px; flex-wrap: wrap;
+    padding: 10px 24px 0;
+}
+.modal-cat-btn {
+    padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 500;
+    border: 1.5px solid var(--border); background: var(--surface2); color: var(--text-muted);
+    cursor: pointer; transition: all 0.15s;
+}
+.modal-cat-btn:hover, .modal-cat-btn.active {
+    border-color: var(--accent); background: rgba(233,69,96,0.07); color: var(--accent);
+}
+
+.modal-list {
+    overflow-y: auto; flex: 1;
+    padding: 12px 24px 20px;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.modal-list::-webkit-scrollbar { width: 4px; }
+.modal-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.suggestion-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 12px 14px;
+    cursor: pointer; transition: all 0.15s;
+    position: relative;
+}
+.suggestion-item:hover {
+    border-color: var(--accent);
+    background: rgba(233,69,96,0.03);
+    transform: translateX(2px);
+}
+.suggestion-item .sug-metier {
+    font-size: 0.7rem; font-weight: 600; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 5px;
+}
+.suggestion-item .sug-text {
+    font-size: 0.83rem; line-height: 1.55; color: var(--text);
+}
+.suggestion-item .sug-use {
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    opacity: 0; background: var(--accent); color: white;
+    padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 600;
+    transition: opacity 0.15s; pointer-events: none;
+}
+.suggestion-item:hover .sug-use { opacity: 1; }
+
+.modal-empty {
+    text-align: center; color: var(--text-muted); font-size: 0.85rem;
+    padding: 30px 0;
+}
+.modal-empty i { font-size: 2rem; display: block; margin-bottom: 8px; opacity: 0.3; }
+
+/* Badge auto-detect under métier field */
+.metier-suggestion-hint {
+    font-size: 0.75rem; color: var(--accent);
+    display: flex; align-items: center; gap: 5px;
+    margin-top: -6px; margin-bottom: 8px;
+    cursor: pointer; width: fit-content;
+    animation: slideIn 0.2s ease;
+}
+.metier-suggestion-hint:hover { text-decoration: underline; }
+
 </style>
 </head>
 <body>
@@ -584,7 +709,7 @@ input[type="file"] { display: none; }
                 </div>
                 <div class="field">
                     <label>Métier / Titre</label>
-                    <input type="text" id="metier" placeholder="Votre métier" oninput="mettreAJourCV()"/>
+                    <input type="text" id="metier" placeholder="Votre métier" oninput="mettreAJourCV(); detecterMetier()"/>
                 </div>
             </div>
 
@@ -625,7 +750,14 @@ input[type="file"] { display: none; }
             <div class="field single">
                 <label>Résumé / motivation</label>
                 <textarea id="accroche" placeholder="Présentez-vous en quelques phrases : votre parcours, vos valeurs, vos objectifs professionnels..." oninput="mettreAJourCV()" style="min-height:90px;"></textarea>
+                <div id="hint-suggestions" style="display:none;" class="metier-suggestion-hint" onclick="ouvrirModal()">
+                    <i class="fas fa-magic"></i> <span id="hint-text">Voir des phrases suggérées pour ce métier</span>
+                </div>
             </div>
+            <button class="btn btn-ghost" onclick="ouvrirModal()" style="width:100%; justify-content:center; margin-top:4px;">
+                <i class="fas fa-lightbulb" style="color:var(--accent);"></i> Parcourir les phrases d'accroche suggérées
+            </button>
+
 
             <!-- Thème -->
             <div class="section-title"><i class="fas fa-palette"></i> Thème de couleurs</div>
@@ -999,10 +1131,195 @@ async function genererPDF() {
     pdf.save(`${nom.replace(/\s+/g, '_')}_CV.pdf`);
 }
 
+
+// ─── Données suggestions ──────────────────────────────────────────────────────
+const SUGGESTIONS = [
+  // Santé
+  { metier: "Infirmier(ère)", cat: "Santé", texte: "Infirmier(ère) diplômé(e) d'État, je m'engage chaque jour au service des patients avec rigueur, empathie et réactivité. Mon expérience en milieu hospitalier m'a permis de développer de solides compétences cliniques ainsi qu'une capacité à travailler en équipe pluridisciplinaire dans des environnements exigeants." },
+  { metier: "Aide-soignant(e)", cat: "Santé", texte: "Aide-soignant(e) attentionné(e) et bienveillant(e), je place le bien-être du patient au cœur de ma pratique quotidienne. Habitué(e) aux environnements de soin variés, je fais preuve d'écoute, de patience et d'adaptabilité face aux situations les plus délicates." },
+  { metier: "Médecin", cat: "Santé", texte: "Médecin généraliste passionné(e) par la relation patient, je m'investis pleinement dans le suivi global de la santé de mes patients. Mon approche allie rigueur diagnostique, écoute active et engagement pour une médecine de proximité accessible à tous." },
+  { metier: "Pharmacien(ne)", cat: "Santé", texte: "Pharmacien(ne) diplômé(e), je m'applique à conseiller chaque patient avec précision et bienveillance. Mon sens du service, ma maîtrise de la pharmacologie et mon goût pour le travail d'équipe font de moi un(e) professionnel(le) fiable et engagé(e)." },
+  { metier: "Kinésithérapeute", cat: "Santé", texte: "Kinésithérapeute diplômé(e), j'accompagne mes patients vers le rétablissement et le maintien de leurs capacités physiques. Pédagogie, technicité et écoute sont les piliers de ma pratique, au service d'une rééducation personnalisée et efficace." },
+  { metier: "Psychologue", cat: "Santé", texte: "Psychologue clinicien(ne), j'accompagne les personnes traversant des difficultés émotionnelles ou psychiques avec bienveillance et professionnalisme. Ma formation pluridisciplinaire et mon sens de l'écoute me permettent de proposer un suivi adapté à chaque situation." },
+
+  // Commerce & Vente
+  { metier: "Commercial(e)", cat: "Commerce", texte: "Commercial(e) dynamique et orienté(e) résultats, je m'épanouis dans la relation client et la conquête de nouveaux marchés. Ma capacité à identifier les besoins, à argumenter et à fidéliser m'ont permis d'atteindre et dépasser mes objectifs de vente de façon régulière." },
+  { metier: "Vendeur(se)", cat: "Commerce", texte: "Passionné(e) par le contact humain et la satisfaction client, j'apporte conseil, écoute et enthousiasme à chaque interaction. Mon sens du service et ma connaissance produit me permettent d'accompagner efficacement les clients vers le meilleur choix." },
+  { metier: "Responsable commercial(e)", cat: "Commerce", texte: "Fort(e) d'une expérience solide dans le développement commercial, je pilote des équipes de vente avec exigence et bienveillance. Ma vision stratégique, mon sens de la négociation et ma capacité à fédérer autour d'objectifs communs sont mes principaux atouts." },
+  { metier: "Chargé(e) de clientèle", cat: "Commerce", texte: "Chargé(e) de clientèle investi(e), je bâtis des relations de confiance durables en plaçant la satisfaction client au premier plan. Mon écoute active, ma réactivité et ma maîtrise des outils CRM me permettent d'assurer un suivi personnalisé et de qualité." },
+  { metier: "Téléconseiller(ère)", cat: "Commerce", texte: "Téléconseiller(ère) à l'écoute et orienté(e) solution, j'assure chaque contact client avec professionnalisme et empathie. Ma clarté d'expression, ma gestion du stress et mon sens de la satisfaction font de moi un(e) interlocuteur(trice) efficace et apprécié(e)." },
+
+  // Administratif & RH
+  { metier: "Assistant(e) administratif(ve)", cat: "Administratif", texte: "Organisé(e), rigoureux(se) et polyvalent(e), j'assure le bon fonctionnement administratif d'une structure avec efficacité. Ma maîtrise des outils bureautiques et mon sens des priorités me permettent de gérer simultanément plusieurs missions avec sérénité." },
+  { metier: "Secrétaire", cat: "Administratif", texte: "Secrétaire expérimenté(e), je suis le pivot organisationnel d'une équipe : gestion d'agenda, accueil, rédaction et coordination font partie de mon quotidien. Discret(e), fiable et réactif(ve), je m'adapte rapidement à tout environnement professionnel." },
+  { metier: "Chargé(e) RH", cat: "Administratif", texte: "Passionné(e) par les ressources humaines, j'accompagne les collaborateurs et les managers tout au long du cycle de vie en entreprise. Mon sens de l'écoute, ma connaissance du droit social et ma capacité à gérer des projets RH transverses sont mes forces essentielles." },
+  { metier: "Comptable", cat: "Administratif", texte: "Comptable rigoureux(se) et organisé(e), je garantis la fiabilité des données financières et le respect des obligations légales. Ma maîtrise des logiciels comptables et mon sens du détail me permettent d'assurer clôtures, déclarations et reportings avec précision." },
+  { metier: "Assistant(e) de direction", cat: "Administratif", texte: "Assistant(e) de direction réactif(ve) et discret(e), je facilite le quotidien des dirigeants en assurant une gestion fluide des priorités, des déplacements et des communications. Mon sens de l'anticipation et ma polyvalence sont des atouts reconnus." },
+  { metier: "Juriste", cat: "Administratif", texte: "Juriste rigoureux(se) et analytique, j'accompagne les entités dans la sécurisation de leurs actes et la gestion de leurs risques juridiques. Ma capacité à vulgariser des sujets complexes et à proposer des solutions pragmatiques est appréciée de mes interlocuteurs." },
+
+  // Éducation
+  { metier: "Enseignant(e)", cat: "Éducation", texte: "Enseignant(e) engagé(e), je crois profondément en le potentiel de chaque élève. Ma pédagogie s'appuie sur l'écoute, la bienveillance et l'adaptation aux différents profils d'apprentissage pour favoriser la réussite de tous dans un cadre stimulant." },
+  { metier: "Éducateur(trice)", cat: "Éducation", texte: "Éducateur(trice) spécialisé(e), j'accompagne des publics fragilisés vers plus d'autonomie et d'épanouissement. Mon approche associe écoute, créativité et rigueur éducative pour construire des projets personnalisés porteurs de sens et de progrès." },
+  { metier: "Animateur(trice)", cat: "Éducation", texte: "Animateur(trice) enthousiaste et créatif(ve), je conçois et anime des activités qui favorisent le lien social, l'épanouissement et le développement de chacun. Mon énergie, mon sens du collectif et mon adaptabilité font de moi un(e) professionnel(le) apprécié(e)." },
+  { metier: "Formateur(trice)", cat: "Éducation", texte: "Formateur(trice) expérimenté(e), je conçois et anime des parcours de formation sur-mesure pour adultes. Ma pédagogie active, ma maîtrise des outils numériques et ma capacité à maintenir l'engagement des apprenants garantissent des formations efficaces et mémorables." },
+
+  // Bâtiment & Technique
+  { metier: "Électricien(ne)", cat: "Technique", texte: "Électricien(ne) qualifié(e), j'interviens sur des installations variées avec rigueur et respect des normes de sécurité. Soucieux(se) du travail bien fait, je sais m'adapter aussi bien aux chantiers neufs qu'aux dépannages urgents tout en assurant la satisfaction du client." },
+  { metier: "Plombier(ère)", cat: "Technique", texte: "Plombier(ère) expérimenté(e), j'assure installations, maintenances et dépannages avec professionnalisme et ponctualité. Mon sens du service, ma réactivité et ma maîtrise des techniques de plomberie et de chauffage me permettent d'intervenir efficacement dans toutes situations." },
+  { metier: "Maçon(ne)", cat: "Technique", texte: "Maçon(ne) expérimenté(e), je réalise des travaux de gros œuvre et de rénovation avec soin et professionnalisme. Mon sens des responsabilités, mon esprit d'équipe et ma capacité à lire des plans me permettent de mener à bien des chantiers de toute envergure." },
+  { metier: "Technicien(ne) de maintenance", cat: "Technique", texte: "Technicien(ne) de maintenance polyvalent(e), j'assure la disponibilité et la fiabilité des équipements en prévenant les pannes et en intervenant rapidement en cas d'incident. Mon diagnostic précis et ma maîtrise des systèmes mécaniques, électriques et électroniques sont mes points forts." },
+  { metier: "Menuisier(ère)", cat: "Technique", texte: "Menuisier(ère) passionné(e) par la précision et la qualité du bois, je réalise des ouvrages sur-mesure alliant esthétique et durabilité. Mon souci du détail, ma maîtrise des matériaux et mon respect des délais sont les garants d'un travail soigné et reconnu." },
+  { metier: "Charpentier(ère)", cat: "Technique", texte: "Charpentier(ère) qualifié(e), je conçois et réalise des structures bois pour des chantiers neufs et de rénovation. Mon goût pour le travail en hauteur, ma rigueur technique et mon esprit d'équipe me permettent de m'intégrer efficacement sur tout type de chantier." },
+
+  // Restauration & Hôtellerie
+  { metier: "Cuisinier(ère)", cat: "Restauration", texte: "Cuisinier(ère) passionné(e) par les saveurs et le travail de qualité, je m'investis pleinement dans l'élaboration de plats qui allient goût, présentation et régularité. Mon sens de l'organisation, ma rapidité d'exécution et mon esprit d'équipe sont au service d'une cuisine de caractère." },
+  { metier: "Serveur(se)", cat: "Restauration", texte: "Serveur(se) souriant(e) et attentif(ve), j'assure un service fluide et agréable en faisant de chaque client une priorité. Mon sens de l'accueil, ma réactivité et ma capacité à travailler sous pression contribuent à créer une expérience de restauration mémorable." },
+  { metier: "Responsable d'établissement", cat: "Restauration", texte: "Manager de restauration expérimenté(e), je pilote avec engagement la performance opérationnelle et humaine d'un établissement. Gestion des équipes, suivi des indicateurs et qualité de service sont au cœur de ma démarche quotidienne." },
+  { metier: "Pâtissier(ère)", cat: "Restauration", texte: "Pâtissier(ère) créatif(ve) et précis(e), je façonne des créations sucrées alliant technicité et esthétique. Ma passion pour les saveurs, mon exigence sur la qualité des produits et mon sens artistique font de chaque réalisation une véritable signature." },
+  { metier: "Réceptionniste", cat: "Restauration", texte: "Réceptionniste souriant(e) et polyglotte, je suis le premier visage que voient les clients et je m'applique à rendre leur accueil irréprochable. Ma maîtrise des logiciels hôteliers, mon sens du service et ma gestion sereine des imprévus sont mes principaux atouts." },
+
+  // Transport & Logistique
+  { metier: "Chauffeur(se) livreur(se)", cat: "Transport", texte: "Chauffeur(se)-livreur(se) ponctuel(le) et organisé(e), j'assure mes tournées avec efficacité et le sourire. Mon sens du service, ma connaissance des itinéraires et mon respect des délais garantissent une livraison fiable et de qualité à chaque client." },
+  { metier: "Logisticien(ne)", cat: "Transport", texte: "Logisticien(ne) rigoureux(se), j'optimise les flux de marchandises pour garantir performance et fiabilité de la chaîne d'approvisionnement. Ma maîtrise des outils de gestion d'entrepôt, mon sens de l'organisation et ma capacité à anticiper les aléas font de moi un maillon solide de la supply chain." },
+  { metier: "Cariste", cat: "Transport", texte: "Cariste certifié(e), j'assure la gestion des flux de marchandises en entrepôt avec efficacité et rigueur. Mon respect des consignes de sécurité, ma précision et ma réactivité contribuent à la bonne organisation des stocks et au respect des délais." },
+  { metier: "Conducteur(trice) routier(ère)", cat: "Transport", texte: "Conducteur(trice) routier(ère) expérimenté(e), j'assure le transport de marchandises dans le respect des délais, des réglementations et des normes de sécurité. Mon professionnalisme, ma connaissance des itinéraires et mon sens des responsabilités sont reconnus de mes employeurs." },
+
+  // Communication & Marketing
+  { metier: "Chargé(e) de communication", cat: "Communication", texte: "Chargé(e) de communication créatif(ve) et stratégique, je conçois et déploie des campagnes qui renforcent l'image de marque et engagent les audiences cibles. Ma maîtrise des outils digitaux, mon sens rédactionnel et ma capacité à coordonner plusieurs projets simultanément sont mes atouts." },
+  { metier: "Graphiste", cat: "Communication", texte: "Graphiste passionné(e) par le design et la narration visuelle, je traduis des idées en identités visuelles fortes et cohérentes. Sens esthétique, maîtrise des outils créatifs et écoute du client sont les fondements de ma pratique." },
+  { metier: "Community manager", cat: "Communication", texte: "Community manager curieux(se) et créatif(ve), je développe la présence digitale des marques en produisant des contenus qui engagent et fédèrent les communautés. Mon analyse des tendances, ma réactivité et ma maîtrise des réseaux sociaux font de moi un(e) interlocuteur(trice) de confiance." },
+  { metier: "Chargé(e) de marketing", cat: "Communication", texte: "Chargé(e) de marketing analytique et créatif(ve), j'élabore des stratégies qui allient données et créativité pour maximiser l'impact des campagnes. Mon approche orientée résultats, ma curiosité et ma veille permanente sur les tendances du marché sont mes forces." },
+  { metier: "Journaliste", cat: "Communication", texte: "Journaliste curieux(se) et rigoureux(se), je m'engage à informer avec exactitude, clarté et indépendance. Mon sens de l'investigation, ma capacité à synthétiser des informations complexes et mon aisance rédactionnelle me permettent de traiter des sujets variés avec pertinence." },
+
+  // Sécurité
+  { metier: "Agent(e) de sécurité", cat: "Sécurité", texte: "Agent(e) de sécurité titulaire du CQP APS, j'assure la protection des personnes et des biens avec vigilance et professionnalisme. Mon calme en situation de tension, mon sens des responsabilités et mon respect des procédures font de moi un(e) professionnel(le) de confiance." },
+  { metier: "Pompier", cat: "Sécurité", texte: "Sapeur-pompier engagé(e), j'interviens avec sang-froid et efficacité pour protéger les personnes, les biens et l'environnement. Esprit d'équipe, courage et sens du devoir guident chacune de mes missions, en toutes circonstances." },
+
+  // Finance
+  { metier: "Conseiller(ère) financier(ère)", cat: "Finance", texte: "Conseiller(ère) financier(ère) à l'écoute et rigoureux(se), j'accompagne mes clients dans leurs décisions patrimoniales avec pédagogie et transparence. Ma maîtrise des produits financiers, mon sens de la relation et mon souci d'un conseil personnalisé sont mes atouts différenciants." },
+  { metier: "Contrôleur(se) de gestion", cat: "Finance", texte: "Contrôleur(se) de gestion analytique et proactif(ve), je pilote la performance financière de l'entreprise en fournissant des analyses fiables et des recommandations actionnables. Ma rigueur, ma maîtrise des outils de reporting et ma vision globale de l'activité sont mes points forts." },
+];
+
+const CATS = [...new Set(SUGGESTIONS.map(s => s.cat))];
+
+// ─── Modal logic ──────────────────────────────────────────────────────────────
+let activeFilter = null;
+
+function ouvrirModal() {
+    const overlay = document.getElementById('suggestions-overlay');
+    overlay.style.display = 'flex';
+    document.getElementById('modal-search-input').value = '';
+    renderCats();
+    renderSuggestions();
+    // pre-filter on current métier
+    const metier = document.getElementById('metier').value.trim().toLowerCase();
+    if (metier) {
+        document.getElementById('modal-search-input').value = metier;
+    }
+    filtrerSuggestions();
+    setTimeout(() => document.getElementById('modal-search-input').focus(), 80);
+}
+
+function fermerModal() {
+    document.getElementById('suggestions-overlay').style.display = 'none';
+}
+
+function renderCats() {
+    const container = document.getElementById('modal-cats');
+    container.innerHTML = `<button class="modal-cat-btn ${!activeFilter ? 'active' : ''}" onclick="filtrerParCat(null)">Tous</button>` +
+        CATS.map(cat => `<button class="modal-cat-btn ${activeFilter===cat ? 'active' : ''}" onclick="filtrerParCat('${cat}')">${cat}</button>`).join('');
+}
+
+function filtrerParCat(cat) {
+    activeFilter = cat;
+    renderCats();
+    filtrerSuggestions();
+}
+
+function filtrerSuggestions() {
+    const q = document.getElementById('modal-search-input').value.trim().toLowerCase();
+    let items = SUGGESTIONS;
+    if (activeFilter) items = items.filter(s => s.cat === activeFilter);
+    if (q) items = items.filter(s => s.metier.toLowerCase().includes(q) || s.texte.toLowerCase().includes(q) || s.cat.toLowerCase().includes(q));
+    renderSuggestions(items);
+    // badge
+    const badge = document.getElementById('modal-badge');
+    if (q) { badge.textContent = q; badge.style.display = 'inline'; }
+    else { badge.style.display = 'none'; }
+}
+
+function renderSuggestions(items) {
+    if (items === undefined) items = SUGGESTIONS;
+    const list = document.getElementById('modal-list');
+    if (!items.length) {
+        list.innerHTML = `<div class="modal-empty"><i class="fas fa-search"></i>Aucune suggestion pour ce terme.<br>Essayez un autre mot-clé.</div>`;
+        return;
+    }
+    list.innerHTML = items.map((s, i) => `
+        <div class="suggestion-item" onclick="utiliserSuggestion(${SUGGESTIONS.indexOf(s)})">
+            <div class="sug-metier">${s.metier} · ${s.cat}</div>
+            <div class="sug-text">${s.texte}</div>
+            <span class="sug-use"><i class="fas fa-check"></i> Utiliser</span>
+        </div>
+    `).join('');
+}
+
+function utiliserSuggestion(idx) {
+    const s = SUGGESTIONS[idx];
+    const textarea = document.getElementById('accroche');
+    textarea.value = s.texte;
+    mettreAJourCV();
+    fermerModal();
+    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    textarea.focus();
+}
+
+// ─── Auto-detect métier ───────────────────────────────────────────────────────
+function detecterMetier() {
+    const metier = document.getElementById('metier').value.trim().toLowerCase();
+    const hint = document.getElementById('hint-suggestions');
+    const hintText = document.getElementById('hint-text');
+    if (!metier || metier.length < 3) { hint.style.display = 'none'; return; }
+    const match = SUGGESTIONS.find(s => s.metier.toLowerCase().includes(metier) || metier.includes(s.metier.toLowerCase().replace(/[()\/]/g,'')));
+    if (match) {
+        hintText.textContent = `✨ Suggestions disponibles pour "${match.metier}"`;
+        hint.style.display = 'flex';
+    } else {
+        const partialCat = SUGGESTIONS.find(s => metier.length >= 4 && s.metier.toLowerCase().split(' ').some(w => w.startsWith(metier.substring(0,4))));
+        if (partialCat) {
+            hintText.textContent = `✨ Voir les phrases suggérées pour des métiers similaires`;
+            hint.style.display = 'flex';
+        } else {
+            hint.style.display = 'none';
+        }
+    }
+}
+
+// Close on Escape
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fermerModal(); });
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 ajouterExperience();
 ajouterFormation();
 mettreAJourCV();
 </script>
+
+<!-- Modal suggestions (at body level to avoid stacking context issues) -->
+<div id="suggestions-overlay" class="suggestions-overlay" style="display:none;" onclick="if(event.target===this)fermerModal()">
+    <div class="suggestions-modal">
+        <div class="modal-header">
+            <div class="modal-icon"><i class="fas fa-quote-left"></i></div>
+            <h3>Phrases d'accroche suggérées</h3>
+            <span id="modal-badge" class="modal-metier-badge" style="display:none;"></span>
+            <button class="modal-close" onclick="fermerModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-search">
+            <input type="text" id="modal-search-input" placeholder="Rechercher un métier..." oninput="filtrerSuggestions()"/>
+        </div>
+        <div class="modal-cats" id="modal-cats"></div>
+        <div class="modal-list" id="modal-list"></div>
+    </div>
+</div>
+
 </body>
 </html>
